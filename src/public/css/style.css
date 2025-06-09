@@ -1,0 +1,15 @@
+body {
+    background: linear-gradient(90deg, #58287D 0%, #31004C 50%, #0C0B17 100%);
+    font-family: 'Lexend', sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.grid {
+    display: grid;
+    gap: 20px;
+}
