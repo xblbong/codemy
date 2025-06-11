@@ -14,10 +14,10 @@ $result = mysqli_query($koneksi, $query);
                 </div>
             </div>
         </div>
-        <button class="bg-[#6D00A8] text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-primary-hover transition-colors duration-300">
+        <!-- <button class="bg-[#6D00A8] text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-primary-hover transition-colors duration-300">
             <span class="hidden md:inline">Tambah Anggota</span>
             <i class="fa-solid fa-plus"></i>
-        </button>
+        </button> -->
     </div>
 
     <!-- Tabel Data Anggota -->
