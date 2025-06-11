@@ -2,6 +2,16 @@
 session_start();
 require_once '../config/koneksi.php';
 $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
+
+$pageTitles = [
+    'dashboard' => 'Dashboard',
+    'anggota' => 'Manajemen Anggota',
+    'modul' => 'Manajemen Modul',
+    'kuis' => 'Ringkasan Kuis',
+    'tambah_modul' => 'Tambah Modul' 
+];
+
+$pageTitle = isset($pageTitles[$currentPage]) ? $pageTitles[$currentPage] : 'Halaman Tidak Ditemukan';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -42,7 +52,8 @@ $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
     <?php include('includes/sidebar.php'); ?>
     <main class="flex-1 p-10">
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-extrabold text-codemy-dark"><?php echo ucfirst($currentPage); ?></h1>
+            <h1 class="text-3xl font-extrabold text-codemy-dark"><?php echo $pageTitle; ?></h1>
+
             <div class="flex items-center gap-3">
                 <?php include('includes/header.php'); ?>
             </div>
