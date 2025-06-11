@@ -56,6 +56,9 @@ $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
             case 'modul':
                 include 'modul.php';
                 break;
+            case 'tambah_modul':
+                include 'form/form-modul.php';
+                break;
             case 'kuis':
                 include 'kuis.php';
                 break;
