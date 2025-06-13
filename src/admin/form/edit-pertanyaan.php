@@ -67,7 +67,7 @@ unset($_SESSION['pesan_error']);
                 <!-- Penjelasan Jawaban -->
                  <div>
                     <label for="penjelasan" class="block text-sm font-medium text-slate-700 mb-2">Penjelasan Jawaban (Opsional)</label>
-                    <textarea name="penjelasan" id="penjelasan" rows="3" class="w-full p-3 border rounded-lg"><?php echo htmlspecialchars($pertanyaan['penjelasan']); ?></textarea>
+                    <textarea name="penjelasan" id="penjelasan" rows="3" class="w-full p-3 border rounded-lg" placeholder="Jelaskan mengapa jawaban tersebut benar..."><?php echo htmlspecialchars($pertanyaan['penjelasan']); ?></textarea>
                 </div>
 
                 <!-- Tombol Aksi -->

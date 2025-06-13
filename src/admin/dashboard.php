@@ -139,6 +139,7 @@ $pageTitles = [
     'modul' => 'Manajemen Modul',
     'kuis' => 'Ringkasan Kuis',
     'tambah_modul' => 'Tambah Modul',
+    'edit_modul' => 'Edit Modul',
     'kelola_modul' => 'Kelola Modul',
     'tambah_materi' => 'Tambah Materi',
     'tambah_pertanyaan' => 'Tambah Kuis',
@@ -192,6 +193,106 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit();
         //proses untuk edit materi
+    } else if ($_GET['page'] == 'edit_modul' && isset($_GET['id'])) {
+        // 1. Ambil ID kursus yang akan diedit dari URL
+        $id_kursus_to_edit = (int)$_GET['id'];
+
+        // Siapkan array untuk menampung error
+        $errors = [];
+
+        // 2. Ambil semua data dari form yang disubmit
+        $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
+        $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+        $id_kategori = (int)$_POST['id_kategori'];
+        $banner_lama = $_POST['banner_lama']; // Ini adalah nama file banner yang sudah ada sebelumnya
+
+        // 3. Lakukan validasi dasar untuk input teks
+        if (empty($judul)) {
+            $errors['judul'] = "Judul modul tidak boleh kosong.";
+        } elseif (strlen($judul) < 7) {
+            $errors['judul'] = "Judul modul minimal harus 7 karakter.";
+        }
+
+        if (empty($deskripsi)) {
+            $errors['deskripsi'] = "Deskripsi modul tidak boleh kosong.";
+        } elseif (strlen($deskripsi) < 20) {
+            $errors['deskripsi'] = "Deskripsi modul minimal harus 20 karakter.";
+        }
+
+        if (empty($id_kategori)) {
+            $errors['kategori'] = "Kategori harus dipilih.";
+        }
+
+        // 4. Proses upload file banner BARU (jika admin mengupload file baru)
+        $nama_file_banner_baru = $banner_lama; // Defaultnya, kita pakai nama file lama
+        if (isset($_FILES['gambar_banner']) && $_FILES['gambar_banner']['error'] == UPLOAD_ERR_OK) {
+
+            // Aturan validasi file
+            $max_file_size = 2 * 1024 * 1024; // 2 MB
+            $allowed_ext = ['png', 'jpg', 'jpeg', 'webp'];
+
+            // Info file yang diupload
+            $file_size = $_FILES['gambar_banner']['size'];
+            $file_name = $_FILES['gambar_banner']['name'];
+            $file_tmp_name = $_FILES['gambar_banner']['tmp_name'];
+            $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+            // Validasi ukuran
+            if ($file_size > $max_file_size) {
+                $errors['banner'] = "Ukuran gambar tidak boleh lebih dari 2 MB.";
+            }
+
+            // Validasi format/ekstensi
+            if (!in_array($file_ext, $allowed_ext)) {
+                $errors['banner'] = "Format gambar tidak valid. Hanya izinkan: " . implode(', ', $allowed_ext);
+            }
+
+            // Jika validasi file lolos
+            if (!isset($errors['banner'])) {
+                // Buat nama file yang unik untuk menghindari konflik
+                $nama_file_banner_baru = uniqid('banner_', true) . '.' . $file_ext;
+                $upload_path = __DIR__ . '/../public/uploads/banners/' . $nama_file_banner_baru;
+
+                // Pindahkan file yang diupload ke folder tujuan
+                if (move_uploaded_file($file_tmp_name, $upload_path)) {
+                    // Jika upload file BARU berhasil, HAPUS file banner LAMA
+                    if (!empty($banner_lama) && file_exists(__DIR__ . '/../public/uploads/banners/' . $banner_lama)) {
+                        unlink(__DIR__ . '/../public/uploads/banners/' . $banner_lama);
+                    }
+                } else {
+                    $errors['banner'] = "Gagal memindahkan file yang diupload.";
+                }
+            }
+        }
+
+        // 5. Jika tidak ada error sama sekali setelah semua validasi
+        if (empty($errors)) {
+            // Buat query UPDATE untuk memperbarui data di database
+            $query_update = "UPDATE kursus SET 
+                           judul = '$judul', 
+                           deskripsi = '$deskripsi', 
+                           id_kategori = '$id_kategori',
+                           gambar_banner = '$nama_file_banner_baru'
+                         WHERE id_kursus = $id_kursus_to_edit";
+
+            if (mysqli_query($koneksi, $query_update)) {
+                // Jika berhasil, siapkan pesan sukses dan redirect ke halaman modul
+                $_SESSION['pesan_sukses'] = "Modul '<strong>" . htmlspecialchars($judul) . "</strong>' berhasil diperbarui.";
+                header("Location: dashboard.php?page=modul");
+                exit();
+            } else {
+                // Jika query gagal
+                $errors['database'] = "Gagal memperbarui data di database: " . mysqli_error($koneksi);
+            }
+        }
+
+        // 6. Jika ada error (baik dari validasi input atau file), lakukan ini:
+        // Simpan array errors dan data input lama ke session
+        $_SESSION['form_errors'] = $errors;
+        $_SESSION['old_input'] = $_POST;
+        // Redirect kembali ke halaman form edit untuk menampilkan pesan error
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
     } else if ($_GET['page'] == 'edit_materi' && isset($_GET['id_materi'])) {
         $id_materi = (int)$_GET['id_materi'];
 
@@ -384,6 +485,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
                 break;
             case 'tambah_modul':
                 include 'form/form-modul.php';
+                break;
+            case 'edit_modul':
+                include 'form/edit-modul.php';
                 break;
             case 'kelola_modul':
                 include 'form/kelola-modul.php';

@@ -17,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($judul_kursus)) {
         $errors['judul_kursus'] = "Judul kursus harus diisi.";
     } elseif (strlen($judul_kursus) < 7) {
-        $errors['judul_kursus'] = "Judul kursus minimal harus 10 karakter.";
+        $errors['judul_kursus'] = "Judul kursus minimal harus 7 karakter.";
     }
     if (empty($deskripsi_kursus)) {
         $errors['deskripsi_kursus'] = "Deskripsi kursus harus diisi.";
     } elseif (strlen($deskripsi_kursus) < 15) {
-        $errors['deskripsi_kursus'] = "Deskripsi kursus minimal harus 50 karakter.";
+        $errors['deskripsi_kursus'] = "Deskripsi kursus minimal harus 15 karakter.";
     }
     if (empty($id_kategori)) {
         $errors['kategori'] = "Kategori harus dipilih.";
@@ -31,12 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($judul_materi)) {
         $errors['judul_materi'] = "Judul materi harus diisi.";
     } elseif (strlen($judul_materi) < 7) {
-        $errors['judul_materi'] = "Judul materi minimal harus 10 karakter.";
+        $errors['judul_materi'] = "Judul materi minimal harus 7 karakter.";
     }
     if (empty($isi_materi)) {
         $errors['isi_materi'] = "Deskripsi materi harus diisi.";
     } elseif (strlen($isi_materi) < 15) {
-        $errors['isi_materi'] = "Deskripsi materi minimal harus 50 karakter.";
+        $errors['isi_materi'] = "Deskripsi materi minimal harus 15 karakter.";
     }
 
     // validasi url video

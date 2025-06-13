@@ -60,7 +60,7 @@ unset($_SESSION['old_input']);
                 <div>
                     <label for="isi_materi" class="block text-sm font-medium text-slate-700 mb-2">Isi Materi / Teks</label>
                     <textarea name="isi_materi" id="isi_materi" rows="8" required 
-                              class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 <?php echo isset($errors['isi_materi']) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-codemy-purple-hover'; ?>"
+                              class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 <?php echo isset($errors['isi_materi']) ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-codemy-purple-hover'; ?>" placeholder="Tuliskan isi materi di sini..."
                     ><?php echo htmlspecialchars($old_input['isi_materi'] ?? $materi['isi_materi']); ?></textarea>
                     <?php if (isset($errors['isi_materi'])) echo "<p class='text-red-500 text-xs mt-1'>{$errors['isi_materi']}</p>"; ?>
                 </div>
