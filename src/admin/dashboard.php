@@ -68,22 +68,22 @@ if (isset($_GET['page']) && $_GET['page'] == 'modul' && isset($_GET['aksi']) && 
     exit;
 }
 
-// --- BLOK PEMROSESAN AKSI (HAPUS, EDIT, DLL) ---
+// --- PROSES HAPUS MATERI, PERTANYAAN ---
 if (isset($_GET['page']) && isset($_GET['aksi'])) {
 
-    // --- PROSES HAPUS MATERI ---
+    // hapus materi
     if ($_GET['page'] == 'hapus_materi' && $_GET['aksi'] == 'proses' && isset($_GET['id_materi'])) {
         $id_materi = (int)$_GET['id_materi'];
         
-        // Ambil id_kursus untuk redirect kembali
+        // ambil id_kursus untuk redirect kembali
         $query_get_kursus = "SELECT id_kursus FROM materi WHERE id_materi = $id_materi";
         $result_get_kursus = mysqli_query($koneksi, $query_get_kursus);
         $id_kursus_redirect = mysqli_fetch_assoc($result_get_kursus)['id_kursus'];
 
-        // Hapus juga progress materi terkait
+        // hapus progress_materi
         mysqli_query($koneksi, "DELETE FROM progress_materi WHERE id_materi = $id_materi");
 
-        // Hapus materi utama
+        // hapus materi
         $query_hapus = "DELETE FROM materi WHERE id_materi = $id_materi";
         if (mysqli_query($koneksi, $query_hapus)) {
             $_SESSION['pesan_sukses'] = "Materi berhasil dihapus.";
@@ -91,28 +91,27 @@ if (isset($_GET['page']) && isset($_GET['aksi'])) {
             $_SESSION['pesan_error'] = "Gagal menghapus materi.";
         }
         
-        // Redirect kembali ke halaman kelola modul
+        // redirect ke halaman kelola modul
         header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus_redirect);
         exit();
     }
     
-    // --- PROSES HAPUS PERTANYAAN ---
+    // hapus pertanyaan
     if ($_GET['page'] == 'hapus_pertanyaan' && $_GET['aksi'] == 'proses' && isset($_GET['id_pertanyaan'])) {
         $id_pertanyaan = (int)$_GET['id_pertanyaan'];
 
-        // Ambil id_kursus untuk redirect kembali
+        // ambil id_kursus untuk redirect kembali
         $query_get_kursus = "SELECT id_kursus FROM pertanyaan WHERE id_pertanyaan = $id_pertanyaan";
         $result_get_kursus = mysqli_query($koneksi, $query_get_kursus);
         $id_kursus_redirect = mysqli_fetch_assoc($result_get_kursus)['id_kursus'];
 
-        // Gunakan transaction karena melibatkan beberapa tabel (pilihan_jawaban)
+        //gunakan transaksi untuk memastikan semua query berhasil
         mysqli_begin_transaction($koneksi);
         try {
-            // Hapus dulu semua pilihan jawaban terkait
+            //hapus pilihan jawaban
             mysqli_query($koneksi, "DELETE FROM pilihan_jawaban WHERE id_pertanyaan = $id_pertanyaan");
-            // (Nanti jika ada detail_jawaban, hapus juga dari sana)
 
-            // Hapus pertanyaan utama
+            // hapus pertanyaan
             $query_hapus = "DELETE FROM pertanyaan WHERE id_pertanyaan = $id_pertanyaan";
             if (!mysqli_query($koneksi, $query_hapus)) {
                 throw new Exception("Gagal menghapus pertanyaan.");
@@ -126,7 +125,7 @@ if (isset($_GET['page']) && isset($_GET['aksi'])) {
             $_SESSION['pesan_error'] = "Error: " . $e->getMessage();
         }
 
-        // Redirect kembali ke halaman kelola modul
+        //direct ke halaman kelola modul
         header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus_redirect);
         exit();
     }
@@ -154,7 +153,7 @@ $pageTitle = isset($pageTitles[$currentPage]) ? $pageTitles[$currentPage] : 'Hal
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
     
-    // Proses untuk form TAMBAH MATERI
+    // Proses untuk form tambah materi
     if ($_GET['page'] == 'tambah_materi' && isset($_GET['id_kursus'])) {
         $id_kursus = (int)$_GET['id_kursus'];
         
@@ -193,6 +192,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
         }
 
         // Redirect kembali ke halaman form untuk menampilkan error
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
+
+    //proses untuk edit materi
+     else if ($_GET['page'] == 'edit_materi' && isset($_GET['id_materi'])) {
+        $id_materi = (int)$_GET['id_materi'];
+        
+        // Ambil data dan siapkan array error
+        $errors = [];
+        $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
+        $isi_materi = mysqli_real_escape_string($koneksi, $_POST['isi_materi']);
+        $url_video = mysqli_real_escape_string($koneksi, $_POST['url_video']);
+        $nomor_urut = (int)$_POST['nomor_urut'];
+        $id_kursus = (int)$_POST['id_kursus']; 
+
+        // validasi
+        if (empty($judul)) $errors['judul'] = "Judul materi harus diisi.";
+        if (empty($isi_materi)) $errors['isi_materi'] = "Isi materi harus diisi.";
+        if ($nomor_urut <= 0) $errors['nomor_urut'] = "Nomor urut harus lebih dari 0.";
+        if (!empty($url_video) && !filter_var($url_video, FILTER_VALIDATE_URL)) {
+            $errors['url_video'] = "Format URL video tidak valid.";
+        }
+
+        if (empty($errors)) {
+            // pakai query update untuk memperbarui materi
+            $query = "UPDATE materi SET 
+                        judul = '$judul', 
+                        isi_materi = '$isi_materi', 
+                        url_video = '$url_video', 
+                        nomor_urut = '$nomor_urut' 
+                      WHERE id_materi = $id_materi";
+            
+            if (mysqli_query($koneksi, $query)) {
+                $_SESSION['pesan_sukses'] = "Materi '<strong>" . htmlspecialchars($judul) . "</strong>' berhasil diperbarui!";
+                //redirect ke halaman kelola modul
+                header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus);
+                exit();
+            } else {
+                $_SESSION['form_errors'] = ['database' => 'Gagal memperbarui materi: ' . mysqli_error($koneksi)];
+            }
+        } else {
+            //error ditampung ke session
+            $_SESSION['form_errors'] = $errors;
+            $_SESSION['old_input'] = $_POST;
+        }
+
+        //redirect ke halaman form untuk menampilkan error
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit();
     }
