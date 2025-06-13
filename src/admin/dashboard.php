@@ -68,6 +68,74 @@ if (isset($_GET['page']) && $_GET['page'] == 'modul' && isset($_GET['aksi']) && 
     exit;
 }
 
+// --- BLOK PEMROSESAN AKSI (HAPUS, EDIT, DLL) ---
+if (isset($_GET['page']) && isset($_GET['aksi'])) {
+
+    // --- PROSES HAPUS MATERI ---
+    if ($_GET['page'] == 'hapus_materi' && $_GET['aksi'] == 'proses' && isset($_GET['id_materi'])) {
+        $id_materi = (int)$_GET['id_materi'];
+        
+        // Ambil id_kursus untuk redirect kembali
+        $query_get_kursus = "SELECT id_kursus FROM materi WHERE id_materi = $id_materi";
+        $result_get_kursus = mysqli_query($koneksi, $query_get_kursus);
+        $id_kursus_redirect = mysqli_fetch_assoc($result_get_kursus)['id_kursus'];
+
+        // Hapus juga progress materi terkait
+        mysqli_query($koneksi, "DELETE FROM progress_materi WHERE id_materi = $id_materi");
+
+        // Hapus materi utama
+        $query_hapus = "DELETE FROM materi WHERE id_materi = $id_materi";
+        if (mysqli_query($koneksi, $query_hapus)) {
+            $_SESSION['pesan_sukses'] = "Materi berhasil dihapus.";
+        } else {
+            $_SESSION['pesan_error'] = "Gagal menghapus materi.";
+        }
+        
+        // Redirect kembali ke halaman kelola modul
+        header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus_redirect);
+        exit();
+    }
+    
+    // --- PROSES HAPUS PERTANYAAN ---
+    if ($_GET['page'] == 'hapus_pertanyaan' && $_GET['aksi'] == 'proses' && isset($_GET['id_pertanyaan'])) {
+        $id_pertanyaan = (int)$_GET['id_pertanyaan'];
+
+        // Ambil id_kursus untuk redirect kembali
+        $query_get_kursus = "SELECT id_kursus FROM pertanyaan WHERE id_pertanyaan = $id_pertanyaan";
+        $result_get_kursus = mysqli_query($koneksi, $query_get_kursus);
+        $id_kursus_redirect = mysqli_fetch_assoc($result_get_kursus)['id_kursus'];
+
+        // Gunakan transaction karena melibatkan beberapa tabel (pilihan_jawaban)
+        mysqli_begin_transaction($koneksi);
+        try {
+            // Hapus dulu semua pilihan jawaban terkait
+            mysqli_query($koneksi, "DELETE FROM pilihan_jawaban WHERE id_pertanyaan = $id_pertanyaan");
+            // (Nanti jika ada detail_jawaban, hapus juga dari sana)
+
+            // Hapus pertanyaan utama
+            $query_hapus = "DELETE FROM pertanyaan WHERE id_pertanyaan = $id_pertanyaan";
+            if (!mysqli_query($koneksi, $query_hapus)) {
+                throw new Exception("Gagal menghapus pertanyaan.");
+            }
+
+            mysqli_commit($koneksi);
+            $_SESSION['pesan_sukses'] = "Pertanyaan berhasil dihapus.";
+
+        } catch (Exception $e) {
+            mysqli_rollback($koneksi);
+            $_SESSION['pesan_error'] = "Error: " . $e->getMessage();
+        }
+
+        // Redirect kembali ke halaman kelola modul
+        header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus_redirect);
+        exit();
+    }
+
+    // (Anda bisa tambahkan 'else if' untuk proses aksi lain di sini)
+
+} // Akhir dari blok pemrosesan aksi
+
+
 $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 
 $pageTitles = [

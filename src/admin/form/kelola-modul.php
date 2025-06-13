@@ -23,6 +23,16 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
 ?>
 
 <div class="max-w-7xl mx-auto">
+    <?php
+    if (isset($_SESSION['pesan_sukses'])) {
+        echo '<div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-md" role="alert"><p>' . $_SESSION['pesan_sukses'] . '</p></div>';
+        unset($_SESSION['pesan_sukses']);
+    }
+    if (isset($_SESSION['pesan_error'])) {
+        echo '<div class="bg-red-100 border-l-4 border-danger text-red-700 p-4 mb-6 rounded-md" role="alert"><p>' . $_SESSION['pesan_error'] . '</p></div>';
+        unset($_SESSION['pesan_error']);
+    }
+    ?>
     <div class="flex items-center gap-4 mb-6">
         <a href="dashboard.php?page=modul" class="text-[#6D00A8] hover:text-primary-hover" title="Kembali ke Manajemen Modul">
             <i class="fa-solid fa-arrow-left fa-lg"></i>
@@ -53,7 +63,7 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
                             </div>
                             <div class="space-x-3">
                                 <a href="dashboard.php?page=edit_materi&id_materi=<?php echo $materi['id_materi']; ?>" title="Edit Materi" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pencil"></i></a>
-                                <a href="dashboard.php?page=hapus_materi&id_materi=<?php echo $materi['id_materi']; ?>" onclick="return confirm('Yakin hapus materi ini?');" title="Hapus Materi" class="text-danger hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                                <a href="dashboard.php?page=hapus_materi&aksi=proses&id_materi=<?php echo $materi['id_materi']; ?>" onclick="return confirm('Yakin hapus materi ini?');" title="Hapus Materi" class="text-danger hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
                     <?php endwhile; ?>
@@ -84,7 +94,7 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
                             </div>
                             <div class="space-x-3">
                                 <a href="dashboard.php?page=edit_pertanyaan&id_pertanyaan=<?php echo $soal['id_pertanyaan']; ?>" title="Edit Pertanyaan" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pencil"></i></a>
-                                <a href="dashboard.php?page=hapus_pertanyaan&id_pertanyaan=<?php echo $soal['id_pertanyaan']; ?>" onclick="return confirm('Yakin hapus pertanyaan ini?');" title="Hapus Pertanyaan" class="text-danger hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                                <a href="dashboard.php?page=hapus_pertanyaan&aksi=proses&id_pertanyaan=<?php echo $soal['id_pertanyaan']; ?>" onclick="return confirm('Yakin hapus pertanyaan ini beserta semua pilihan jawabannya?');" title="Hapus Pertanyaan" class="text-danger hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
                     <?php endwhile; ?>
