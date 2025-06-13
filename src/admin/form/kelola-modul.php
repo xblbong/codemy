@@ -34,7 +34,7 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
     }
     ?>
     <div class="flex items-center gap-4 mb-6">
-        <a href="dashboard.php?page=modul" class="text-[#6D00A8] hover:text-primary-hover" title="Kembali ke Manajemen Modul">
+        <a href="dashboard.php?page=modul" class="text-[#6D00A8] hover:text-[#6D00A8]" title="Kembali ke Manajemen Modul">
             <i class="fa-solid fa-arrow-left fa-lg"></i>
         </a>
         <div>
@@ -43,7 +43,7 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
+
         <!-- daftar materi -->
         <div class="bg-white p-6 rounded-xl shadow-md">
             <div class="flex justify-between items-center mb-4">
@@ -77,13 +77,14 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
         <div class="bg-white p-6 rounded-xl shadow-md">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-dark">Daftar Pertanyaan Kuis</h2>
-                <a href="dashboard.php?page=tambah_pertanyaan&id_kursus=<?php echo $id_kursus; ?>" class="bg-[#6D00A8] text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-[#6D00A8]-hover">
+                <a href="dashboard.php?page=tambah_pertanyaan&id_kursus=<?php echo $id_kursus; ?>" class="bg-[#6D00A8] text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-[#6D00A8] transition-colors duration-300">
                     <i class="fa-solid fa-plus"></i> Tambah Pertanyaan
                 </a>
             </div>
             <div class="space-y-3">
-                 <?php if (mysqli_num_rows($result_pertanyaan) > 0): ?>
-                    <?php $no_soal = 1; while ($soal = mysqli_fetch_assoc($result_pertanyaan)): ?>
+                <?php if (mysqli_num_rows($result_pertanyaan) > 0): ?>
+                    <?php $no_soal = 1;
+                    while ($soal = mysqli_fetch_assoc($result_pertanyaan)): ?>
                         <div class="flex justify-between items-center p-3 border rounded-lg hover:bg-slate-50">
                             <div class="flex items-center gap-4">
                                 <span class="text-slate-400 font-bold w-6 text-center"><?php echo $no_soal++; ?></span>

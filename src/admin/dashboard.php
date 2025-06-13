@@ -74,7 +74,7 @@ if (isset($_GET['page']) && isset($_GET['aksi'])) {
     // hapus materi
     if ($_GET['page'] == 'hapus_materi' && $_GET['aksi'] == 'proses' && isset($_GET['id_materi'])) {
         $id_materi = (int)$_GET['id_materi'];
-        
+
         // ambil id_kursus untuk redirect kembali
         $query_get_kursus = "SELECT id_kursus FROM materi WHERE id_materi = $id_materi";
         $result_get_kursus = mysqli_query($koneksi, $query_get_kursus);
@@ -90,12 +90,12 @@ if (isset($_GET['page']) && isset($_GET['aksi'])) {
         } else {
             $_SESSION['pesan_error'] = "Gagal menghapus materi.";
         }
-        
+
         // redirect ke halaman kelola modul
         header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus_redirect);
         exit();
     }
-    
+
     // hapus pertanyaan
     if ($_GET['page'] == 'hapus_pertanyaan' && $_GET['aksi'] == 'proses' && isset($_GET['id_pertanyaan'])) {
         $id_pertanyaan = (int)$_GET['id_pertanyaan'];
@@ -119,7 +119,6 @@ if (isset($_GET['page']) && isset($_GET['aksi'])) {
 
             mysqli_commit($koneksi);
             $_SESSION['pesan_sukses'] = "Pertanyaan berhasil dihapus.";
-
         } catch (Exception $e) {
             mysqli_rollback($koneksi);
             $_SESSION['pesan_error'] = "Error: " . $e->getMessage();
@@ -129,9 +128,7 @@ if (isset($_GET['page']) && isset($_GET['aksi'])) {
         header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus_redirect);
         exit();
     }
-
-
-} 
+}
 
 
 $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
@@ -144,19 +141,19 @@ $pageTitles = [
     'tambah_modul' => 'Tambah Modul',
     'kelola_modul' => 'Kelola Modul',
     'tambah_materi' => 'Tambah Materi',
-    'tambah_kuis' => 'Tambah Kuis',
+    'tambah_pertanyaan' => 'Tambah Kuis',
     'edit_materi' => 'Edit Materi',
-    'edit_kuis' => 'Edit Kuis',
+    'edit_pertanyaan' => 'Edit Kuis',
 ];
 
 $pageTitle = isset($pageTitles[$currentPage]) ? $pageTitles[$currentPage] : 'Halaman Tidak Ditemukan';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
-    
+
     // Proses untuk form tambah materi
     if ($_GET['page'] == 'tambah_materi' && isset($_GET['id_kursus'])) {
         $id_kursus = (int)$_GET['id_kursus'];
-        
+
         // Ambil data dan siapkan array error
         $errors = [];
         $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
@@ -175,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
         if (empty($errors)) {
             $query = "INSERT INTO materi (id_kursus, judul, isi_materi, url_video, nomor_urut) 
                       VALUES ('$id_kursus', '$judul', '$isi_materi', '$url_video', '$nomor_urut')";
-            
+
             if (mysqli_query($koneksi, $query)) {
                 $_SESSION['pesan_sukses'] = "Materi baru '<strong>" . htmlspecialchars($judul) . "</strong>' berhasil ditambahkan!";
                 // Redirect yang benar
@@ -194,19 +191,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
         // Redirect kembali ke halaman form untuk menampilkan error
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit();
-    }
-
-    //proses untuk edit materi
-     else if ($_GET['page'] == 'edit_materi' && isset($_GET['id_materi'])) {
+        //proses untuk edit materi
+    } else if ($_GET['page'] == 'edit_materi' && isset($_GET['id_materi'])) {
         $id_materi = (int)$_GET['id_materi'];
-        
+
         // Ambil data dan siapkan array error
         $errors = [];
         $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
         $isi_materi = mysqli_real_escape_string($koneksi, $_POST['isi_materi']);
         $url_video = mysqli_real_escape_string($koneksi, $_POST['url_video']);
         $nomor_urut = (int)$_POST['nomor_urut'];
-        $id_kursus = (int)$_POST['id_kursus']; 
+        $id_kursus = (int)$_POST['id_kursus'];
 
         // validasi
         if (empty($judul)) $errors['judul'] = "Judul materi harus diisi.";
@@ -224,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
                         url_video = '$url_video', 
                         nomor_urut = '$nomor_urut' 
                       WHERE id_materi = $id_materi";
-            
+
             if (mysqli_query($koneksi, $query)) {
                 $_SESSION['pesan_sukses'] = "Materi '<strong>" . htmlspecialchars($judul) . "</strong>' berhasil diperbarui!";
                 //redirect ke halaman kelola modul
@@ -242,6 +237,91 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
         //redirect ke halaman form untuk menampilkan error
         header("Location: " . $_SERVER['HTTP_REFERER']);
         exit();
+
+        //tambah pertanyaan
+    } else if ($_GET['page'] == 'tambah_pertanyaan' && isset($_GET['id_kursus'])) {
+        $id_kursus = (int)$_GET['id_kursus'];
+
+        // Gunakan transaction karena melibatkan > 1 tabel
+        mysqli_begin_transaction($koneksi);
+        try {
+            // Ambil data & validasi
+            $teks_pertanyaan = mysqli_real_escape_string($koneksi, $_POST['teks_pertanyaan']);
+            if (empty($teks_pertanyaan)) throw new Exception("Teks pertanyaan tidak boleh kosong.");
+
+            // 1. Simpan pertanyaan
+            $query_pertanyaan = "INSERT INTO pertanyaan (id_kursus, teks_pertanyaan, penjelasan) VALUES ('$id_kursus', '$teks_pertanyaan', ?)";
+            $stmt = mysqli_prepare($koneksi, $query_pertanyaan);
+            mysqli_stmt_bind_param($stmt, 's', $_POST['penjelasan']);
+            mysqli_stmt_execute($stmt);
+            $id_pertanyaan_baru = mysqli_insert_id($koneksi);
+
+            // 2. Simpan pilihan jawaban
+            $pilihan_jawaban = $_POST['pilihan_jawaban']; // array
+            $jawaban_benar_index = $_POST['jawaban_benar']; // index (0-3)
+
+            foreach ($pilihan_jawaban as $index => $teks_pilihan) {
+                if (empty($teks_pilihan)) continue; // Lewati jika kosong
+                $apakah_benar = ($index == $jawaban_benar_index) ? 1 : 0;
+                $query_pilihan = "INSERT INTO pilihan_jawaban (id_pertanyaan, teks_pilihan, cek_jawaban) VALUES (?, ?, ?)";
+                $stmt_pilihan = mysqli_prepare($koneksi, $query_pilihan);
+                mysqli_stmt_bind_param($stmt_pilihan, 'isi', $id_pertanyaan_baru, $teks_pilihan, $apakah_benar);
+                mysqli_stmt_execute($stmt_pilihan);
+            }
+
+            // Jika semua berhasil, commit
+            mysqli_commit($koneksi);
+            $_SESSION['pesan_sukses'] = "Pertanyaan baru berhasil ditambahkan.";
+            header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus);
+            exit();
+        } catch (Exception $e) {
+            mysqli_rollback($koneksi);
+            $_SESSION['pesan_error'] = "Gagal menambah pertanyaan: " . $e->getMessage();
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit();
+        }
+
+        // edit pertanyaan
+    } else if ($_GET['page'] == 'edit_pertanyaan' && isset($_GET['id_pertanyaan'])) {
+        $id_pertanyaan = (int)$_GET['id_pertanyaan'];
+        $id_kursus = (int)$_POST['id_kursus']; // Ambil dari hidden input
+
+        mysqli_begin_transaction($koneksi);
+        try {
+            // Ambil data & validasi
+            $teks_pertanyaan = mysqli_real_escape_string($koneksi, $_POST['teks_pertanyaan']);
+            if (empty($teks_pertanyaan)) throw new Exception("Teks pertanyaan tidak boleh kosong.");
+
+            // 1. Update pertanyaan utama
+            $query_update_pertanyaan = "UPDATE pertanyaan SET teks_pertanyaan = ?, penjelasan = ? WHERE id_pertanyaan = ?";
+            $stmt = mysqli_prepare($koneksi, $query_update_pertanyaan);
+            mysqli_stmt_bind_param($stmt, 'ssi', $teks_pertanyaan, $_POST['penjelasan'], $id_pertanyaan);
+            mysqli_stmt_execute($stmt);
+
+            // 2. Update pilihan jawaban
+            $pilihan_ids = $_POST['pilihan_id']; // array id pilihan
+            $pilihan_teks = $_POST['pilihan_teks']; // array teks pilihan
+            $jawaban_benar_id = $_POST['jawaban_benar_id']; // id pilihan yang benar
+
+            foreach ($pilihan_ids as $index => $id_pilihan) {
+                $teks = mysqli_real_escape_string($koneksi, $pilihan_teks[$index]);
+                $apakah_benar = ($id_pilihan == $jawaban_benar_id) ? 1 : 0;
+                $query_update_pilihan = "UPDATE pilihan_jawaban SET teks_pilihan = ?, cek_jawaban = ? WHERE id_pilihan = ?";
+                $stmt_pilihan = mysqli_prepare($koneksi, $query_update_pilihan);
+                mysqli_stmt_bind_param($stmt_pilihan, 'sii', $teks, $apakah_benar, $id_pilihan);
+                mysqli_stmt_execute($stmt_pilihan);
+            }
+
+            mysqli_commit($koneksi);
+            $_SESSION['pesan_sukses'] = "Pertanyaan berhasil diperbarui.";
+            header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus);
+            exit();
+        } catch (Exception $e) {
+            mysqli_rollback($koneksi);
+            $_SESSION['pesan_error'] = "Gagal memperbarui pertanyaan: " . $e->getMessage();
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+            exit();
+        }
     }
 }
 ?>
@@ -265,7 +345,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
                         sans: ['Lexend', 'sans-serif'],
                     },
                     colors: {
-                        'codemy-purple': '#58287D',
+                        'codemy-purple': '#6D00A8',
                         'codemy-dark': '#31004C',
                         'codemy-black': '#0C0B17',
                         'codemy-yellow': '#FFB800',
@@ -294,38 +374,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
             </div>
         </div>
         <!-- set up kondisi untuk memuat file konten berdasarkan halaman yang dipilih -->
-            <?php
-            switch ($currentPage) {
-                case 'anggota':
-                    include 'anggota.php';
-                    break;
-                case 'modul':
-                    include 'modul.php';
-                    break;
-                case 'tambah_modul':
-                    include 'form/form-modul.php';
-                    break;
-                case 'kelola_modul':
-                    include 'form/kelola-modul.php';
-                    break;
-                case 'tambah_materi':
-                    include 'form/tambah-materi.php';
-                    break;
-                case 'edit_materi':
-                    include 'form/edit-materi.php';
-                    break;
-                case 'tambah_kuis':
-                    include 'form/tambah-kuis.php';
-                    break;
-                case 'edit_kuis':
-                    include 'form/edit-kuis.php';
-                    break;
-                case 'kuis':
-                    include 'kuis.php';
-                    break;
-                case 'dashboard':
-                default:
-            ?>
+        <?php
+        switch ($currentPage) {
+            case 'anggota':
+                include 'anggota.php';
+                break;
+            case 'modul':
+                include 'modul.php';
+                break;
+            case 'tambah_modul':
+                include 'form/form-modul.php';
+                break;
+            case 'kelola_modul':
+                include 'form/kelola-modul.php';
+                break;
+            case 'tambah_materi':
+                include 'form/tambah-materi.php';
+                break;
+            case 'edit_materi':
+                include 'form/edit-materi.php';
+                break;
+            case 'tambah_pertanyaan':
+                include 'form/tambah-pertanyaan.php';
+                break;
+            case 'edit_pertanyaan':
+                include 'form/edit-pertanyaan.php';
+                break;
+            case 'kuis':
+                include 'kuis.php';
+                break;
+            case 'dashboard':
+            default:
+        ?>
                 <!-- Card Pelatihan Saya -->
                 <?php
                 // query untuk menghitung total anggota
