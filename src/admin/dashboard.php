@@ -141,6 +141,7 @@ $pageTitles = [
     'tambah_modul' => 'Tambah Modul',
     'edit_modul' => 'Edit Modul',
     'kelola_modul' => 'Kelola Modul',
+    'kelola_kuis' => 'Kelola Kuis',
     'tambah_materi' => 'Tambah Materi',
     'tambah_pertanyaan' => 'Tambah Kuis',
     'edit_materi' => 'Edit Materi',
@@ -223,8 +224,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
             $errors['kategori'] = "Kategori harus dipilih.";
         }
 
-        // 4. Proses upload file banner BARU (jika admin mengupload file baru)
-        $nama_file_banner_baru = $banner_lama; // Defaultnya, kita pakai nama file lama
+        // untuk banner
+        $nama_file_banner_baru = $banner_lama; //default jika tidak ada upload
         if (isset($_FILES['gambar_banner']) && $_FILES['gambar_banner']['error'] == UPLOAD_ERR_OK) {
 
             // Aturan validasi file
@@ -491,6 +492,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
                 break;
             case 'kelola_modul':
                 include 'form/kelola-modul.php';
+                break;
+            case 'kelola_kuis':
+                include 'form/kelola-kuis.php';
                 break;
             case 'tambah_materi':
                 include 'form/tambah-materi.php';

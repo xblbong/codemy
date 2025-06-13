@@ -46,7 +46,7 @@ $result = mysqli_query($koneksi, $query);
                     <th class="p-4 text-center">Jumlah Pertanyaan</th>
                     <th class="p-4 text-center">Jumlah Pengerjaan</th>
                     <th class="p-4 text-center">Rata-rata Skor</th>
-                    <th class="p-4 text-center rounded-r-lg">Aksi</th>
+                    <!-- <th class="p-4 text-center rounded-r-lg">Aksi</th> -->
                 </tr>
             </thead>
             <tbody>
@@ -73,9 +73,9 @@ $result = mysqli_query($koneksi, $query);
                             </td>
                             <td class="p-4 text-center">
                                 <!-- Tombol Kelola Pertanyaan -->
-                                <a href="kelola_kuis.php?id_kursus=<?php echo $row['id_kursus']; ?>" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold hover:bg-blue-200 transition-colors" title="Kelola Pertanyaan">
+                                <!-- <a href="dashboard.php?page=kelola_kuis&id_kursus=<?php echo $row['id_kursus']; ?>" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold hover:bg-blue-200 transition-colors" title="Kelola Pertanyaan">
                                     <i class="fa-solid fa-list-check"></i> Kelola Pertanyaan
-                                </a>
+                                </a> -->
                             </td>
                         </tr>
                     <?php
