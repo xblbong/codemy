@@ -82,7 +82,55 @@ $pageTitles = [
 ];
 
 $pageTitle = isset($pageTitles[$currentPage]) ? $pageTitles[$currentPage] : 'Halaman Tidak Ditemukan';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
+    
+    // Proses untuk form TAMBAH MATERI
+    if ($_GET['page'] == 'tambah_materi' && isset($_GET['id_kursus'])) {
+        $id_kursus = (int)$_GET['id_kursus'];
+        
+        // Ambil data dan siapkan array error
+        $errors = [];
+        $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
+        $isi_materi = mysqli_real_escape_string($koneksi, $_POST['isi_materi']);
+        $url_video = mysqli_real_escape_string($koneksi, $_POST['url_video']);
+        $nomor_urut = (int)$_POST['nomor_urut'];
+
+        // Validasi
+        if (empty($judul)) $errors['judul'] = "Judul materi harus diisi.";
+        if (empty($isi_materi)) $errors['isi_materi'] = "Isi materi harus diisi.";
+        if ($nomor_urut <= 0) $errors['nomor_urut'] = "Nomor urut harus lebih dari 0.";
+        if (!empty($url_video) && !filter_var($url_video, FILTER_VALIDATE_URL)) {
+            $errors['url_video'] = "Format URL video tidak valid.";
+        }
+
+        if (empty($errors)) {
+            $query = "INSERT INTO materi (id_kursus, judul, isi_materi, url_video, nomor_urut) 
+                      VALUES ('$id_kursus', '$judul', '$isi_materi', '$url_video', '$nomor_urut')";
+            
+            if (mysqli_query($koneksi, $query)) {
+                $_SESSION['pesan_sukses'] = "Materi baru '<strong>" . htmlspecialchars($judul) . "</strong>' berhasil ditambahkan!";
+                // Redirect yang benar
+                header("Location: dashboard.php?page=kelola_modul&id_kursus=" . $id_kursus);
+                exit();
+            } else {
+                // Simpan error database ke session untuk ditampilkan di form
+                $_SESSION['form_errors'] = ['database' => 'Gagal menyimpan materi: ' . mysqli_error($koneksi)];
+            }
+        } else {
+            // Jika ada error validasi, simpan error dan data input lama ke session
+            $_SESSION['form_errors'] = $errors;
+            $_SESSION['old_input'] = $_POST;
+        }
+
+        // Redirect kembali ke halaman form untuk menampilkan error
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
+}
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="id">
