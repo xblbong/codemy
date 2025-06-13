@@ -24,7 +24,7 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
 
 <div class="max-w-7xl mx-auto">
     <div class="flex items-center gap-4 mb-6">
-        <a href="dashboard.php?page=modul" class="text-primary hover:text-primary-hover" title="Kembali ke Manajemen Modul">
+        <a href="dashboard.php?page=modul" class="text-[#6D00A8] hover:text-primary-hover" title="Kembali ke Manajemen Modul">
             <i class="fa-solid fa-arrow-left fa-lg"></i>
         </a>
         <div>
@@ -38,7 +38,7 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
         <div class="bg-white p-6 rounded-xl shadow-md">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-dark">Daftar Materi</h2>
-                <a href="dashboard.php?page=tambah_materi&id_kursus=<?php echo $id_kursus; ?>" class="bg-primary text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-primary-hover">
+                <a href="dashboard.php?page=tambah_materi&id_kursus=<?php echo $id_kursus; ?>" class="bg-[#6D00A8] text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-[#6D00A8]-hover">
                     <i class="fa-solid fa-plus"></i> Tambah Materi
                 </a>
             </div>
@@ -48,7 +48,7 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
                         <div class="flex justify-between items-center p-3 border rounded-lg hover:bg-slate-50">
                             <div class="flex items-center gap-4">
                                 <span class="text-slate-400 font-bold w-6 text-center"><?php echo $materi['nomor_urut']; ?></span>
-                                <i class="fa-solid fa-file-alt text-primary"></i>
+                                <i class="fa-solid fa-file-alt text-[#6D00A8]"></i>
                                 <span class="font-medium text-slate-800"><?php echo htmlspecialchars($materi['judul']); ?></span>
                             </div>
                             <div class="space-x-3">
@@ -67,7 +67,7 @@ $result_pertanyaan = mysqli_query($koneksi, $query_pertanyaan);
         <div class="bg-white p-6 rounded-xl shadow-md">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-dark">Daftar Pertanyaan Kuis</h2>
-                <a href="dashboard.php?page=tambah_pertanyaan&id_kursus=<?php echo $id_kursus; ?>" class="bg-primary text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-primary-hover">
+                <a href="dashboard.php?page=tambah_pertanyaan&id_kursus=<?php echo $id_kursus; ?>" class="bg-[#6D00A8] text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-[#6D00A8]-hover">
                     <i class="fa-solid fa-plus"></i> Tambah Pertanyaan
                 </a>
             </div>
