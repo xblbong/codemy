@@ -1,9 +1,51 @@
 <?php
-$query = "SELECT  k.id_kursus, k.judul, p.nama as pembuat, (SELECT COUNT(*) FROM materi WHERE id_kursus = k.id_kursus) AS jumlah_materi, (SELECT COUNT(DISTINCT id_pengguna) FROM riwayat_kuis WHERE id_kursus = k.id_kursus) AS jumlah_peserta FROM kursus k JOIN pengguna p ON k.dibuat_oleh = p.id_pengguna ORDER BY k.judul ASC";
+
+//menampilkan semua data modul
+$kategori_list = mysqli_query($koneksi, "SELECT * FROM kategori ORDER BY nama_kategori ASC");
+$filter_kategori_id = isset($_GET['kategori']) ? (int)$_GET['kategori'] : 0; //cek apa  ada filter kategori yang aktif dari url
+
+// buat query untuk mengambil semua data modul
+$where_clause = "";
+if ($filter_kategori_id > 0) {
+    $where_clause = "WHERE k.id_kategori = " . $filter_kategori_id;
+}
+$query = "SELECT  k.id_kursus, k.judul, k.gambar_banner, k.deskripsi, p.nama as pembuat, kat.nama_kategori, (SELECT COUNT(*) FROM materi WHERE id_kursus = k.id_kursus) AS jumlah_materi, (SELECT COUNT(DISTINCT id_pengguna) FROM riwayat_kuis WHERE id_kursus = k.id_kursus) AS jumlah_peserta FROM kursus k JOIN pengguna p ON k.dibuat_oleh = p.id_pengguna LEFT JOIN kategori kat ON k.id_kategori = kat.id_kategori
+          $where_clause ORDER BY k.judul ASC";
 $result = mysqli_query($koneksi, $query);
+
+if (isset($_SESSION['pesan_sukses'])) {
+    $pesan_sukses = $_SESSION['pesan_sukses'];
+    unset($_SESSION['pesan_sukses']); //hapus pesan jadi tidak tampil lagi waktu di refresh
+}
+
+
+//menampilkan semua data modul
+$kategori_list = mysqli_query($koneksi, "SELECT * FROM kategori ORDER BY nama_kategori ASC");
+$filter_kategori_id = isset($_GET['kategori']) ? (int)$_GET['kategori'] : 0; //cek apa  ada filter kategori yang aktif dari url
+
+// buat query untuk mengambil semua data modul
+$where_clause = "";
+if ($filter_kategori_id > 0) {
+    $where_clause = "WHERE k.id_kategori = " . $filter_kategori_id;
+}
+$query = "SELECT  k.id_kursus, k.judul, k.gambar_banner, k.deskripsi, p.nama as pembuat, kat.nama_kategori, (SELECT COUNT(*) FROM materi WHERE id_kursus = k.id_kursus) AS jumlah_materi, (SELECT COUNT(DISTINCT id_pengguna) FROM riwayat_kuis WHERE id_kursus = k.id_kursus) AS jumlah_peserta FROM kursus k JOIN pengguna p ON k.dibuat_oleh = p.id_pengguna LEFT JOIN kategori kat ON k.id_kategori = kat.id_kategori
+          $where_clause ORDER BY k.judul ASC";
+$result = mysqli_query($koneksi, $query);
+
+if (isset($_SESSION['pesan_sukses'])) {
+    $pesan_sukses = $_SESSION['pesan_sukses'];
+    unset($_SESSION['pesan_sukses']); //hapus pesan jadi tidak tampil lagi waktu di refresh
+}
 ?>
 
 <div class="bg-white p-6 md:p-8 rounded-xl shadow-md">
+    <!-- tampilkan pesan sukses -->
+    <?php if (!empty($pesan_sukses)): ?>
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-md" role="alert">
+            <p class="font-bold">Sukses!</p>
+            <p><?php echo $pesan_sukses; ?></p>
+        </div>
+    <?php endif; ?>
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex flex-col items-left gap-2">
             <h2 class="text-2xl font-bold text-codemy-dark mb-2">Data Modul</h2>
@@ -12,6 +54,24 @@ $result = mysqli_query($koneksi, $query);
                     <input type="text" placeholder="Cari pengguna..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-hover">
                     <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 </div>
+                <form action="dashboard.php" method="GET" class="w-full md:w-1/2">
+                    <input type="hidden" name="page" value="modul">
+                    <div class="relative">
+                        <select name="kategori" onchange="this.form.submit()" class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 appearance-none cursor-pointer text-gray-700 capitalize">
+                            <option value="0">Tampilkan Semua Kategori</option>
+                            <?php while ($kat_filter = mysqli_fetch_assoc($kategori_list)): ?>
+                                <option value="<?php echo $kat_filter['id_kategori']; ?>" <?php echo ($filter_kategori_id == $kat_filter['id_kategori']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($kat_filter['nama_kategori']); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" viewBox="0 0 20 20">
+                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                            </svg>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
         <a href="dashboard.php?page=tambah_modul" class="bg-[#6D00A8] text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-primary-hover transition-colors duration-300">
@@ -22,26 +82,54 @@ $result = mysqli_query($koneksi, $query);
 
     <!-- Tabel Data Modul -->
     <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
+        <table class="w-full text-sm text-center">
             <thead class="bg-slate-100 text-slate-600 uppercase">
                 <tr>
+                    <th class="p-4 rounded-l-lg">No</th>
                     <th class="p-4 rounded-l-lg">Judul Modul</th>
+                    <th class="p-4 text-center">Banner</th>
+                    <th class="p-4 text-center">Deskripsi</th>
+                    <th class="p-4">Kategori</th>
                     <th class="p-4">Dibuat Oleh</th>
-                    <th class="p-4 text-center">Jumlah Materi</th>
+                    <th class="p-4 text-center">Materi</th>
                     <th class="p-4 text-center">Peserta</th>
                     <th class="p-4 text-center rounded-r-lg">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                // Cek apakah query berhasil dan ada data
+                $no = 1;
+                // cek apakah query berhasil dan ada data
                 if ($result && mysqli_num_rows($result) > 0):
-                    // Loop melalui setiap baris data modul
+                    // loop setiap baris data modul
                     while ($row = mysqli_fetch_assoc($result)):
                 ?>
                         <tr class="border-b border-gray-200 hover:bg-slate-50">
+                            <td class="p-4 text-slate-600 text-center">
+                                <?php echo $no; ?>
+                            </td>
+                            <!-- Kolom untuk Judul -->
                             <td class="p-4 font-medium text-dark">
                                 <?php echo htmlspecialchars($row['judul']); ?>
+                            </td>
+                            <!-- Kolom untuk Banner -->
+                            <td class="p-4 w-20">
+                                <img src="../public/uploads/banners/<?php echo htmlspecialchars($row['gambar_banner']); ?>" alt="Banner <?php echo htmlspecialchars($row['judul']); ?>" class="w-20 p-2 h-20 object-cover rounded-md border border-codemy-active">
+                            </td>
+                            <!-- Kolom deskripsi -->
+                            <td class="p-4 text-slate-600 max-w-xs">
+                                <?php
+                                $limit = 10;
+                                $deskripsi = $row['deskripsi'];
+
+                                echo htmlspecialchars(
+                                    strlen($deskripsi) > $limit ? substr($deskripsi, 0, $limit) . '...' : $deskripsi
+                                );
+                                ?>
+                            </td>
+                            <!-- Kolom untuk Kategori -->
+                            <td class="p-4 text-slate-600">
+                                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"><?php echo htmlspecialchars($row['nama_kategori'] ?? 'N/A'); ?></span>
                             </td>
                             <td class="p-4 text-slate-600">
                                 <?php echo htmlspecialchars($row['pembuat']); ?>
@@ -53,27 +141,26 @@ $result = mysqli_query($koneksi, $query);
                                 <?php echo $row['jumlah_peserta']; ?>
                             </td>
                             <td class="p-4 text-center space-x-2">
-                                <!-- Tombol Kelola: Mengarah ke halaman detail untuk menambah/mengedit materi & kuis -->
-                                <a href="kelola_modul.php?id_kursus=<?php echo $row['id_kursus']; ?>" class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold hover:bg-green-200 transition-colors" title="Kelola Konten">
+                                <a href="dashboard.php?page=kelola_modul&id_kursus=<?php echo $row['id_kursus']; ?>" class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold hover:bg-green-200 transition-colors" title="Kelola Konten">
                                     <i class="fa-solid fa-folder-open"></i> Kelola
                                 </a>
-                                <!-- Tombol Edit: Untuk mengedit judul/deskripsi modul -->
                                 <a href="edit_modul.php?id=<?php echo $row['id_kursus']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit Modul">
                                     <i class="fa-solid fa-pencil"></i>
                                 </a>
                                 <!-- Tombol Hapus -->
-                                <a href="hapus_modul.php?id=<?php echo $row['id_kursus']; ?>" onclick="return confirm('Yakin ingin menghapus modul ini? Semua materi dan kuis di dalamnya akan ikut terhapus!');" class="text-danger hover:text-red-700" title="Hapus Modul">
+                                <a href="dashboard.php?page=modul&aksi=hapus&id=<?php echo $row['id_kursus']; ?>" onclick="return confirm('Yakin ingin menghapus modul ini? Semua materi dan kuis di dalamnya akan ikut terhapus!');" class="text-red-500 hover:text-red-700" title="Hapus Modul">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                             </td>
                         </tr>
-                <?php
+                    <?php
+                        $no++;
                     endwhile;
                 else:
-                ?>
+                    ?>
                     <!-- Tampilan jika tidak ada data modul -->
                     <tr>
-                        <td colspan="5" class="p-8 text-center text-slate-500">
+                        <td colspan="9" class="p-8 text-slate-500">
                             Belum ada modul yang dibuat. Silakan klik "Tambah Modul" untuk memulai.
                         </td>
                     </tr>

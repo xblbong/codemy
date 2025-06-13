@@ -1,6 +1,73 @@
 <?php
 session_start();
 require_once '../config/koneksi.php';
+
+//hapus modul
+if (isset($_GET['page']) && $_GET['page'] == 'modul' && isset($_GET['aksi']) && $_GET['aksi'] == 'hapus' && isset($_GET['id'])) {
+
+    $id_kursus_to_delete = (int)$_GET['id'];
+
+    mysqli_begin_transaction($koneksi);
+
+    try {
+        $query_get_banner = "SELECT gambar_banner, judul FROM kursus WHERE id_kursus = $id_kursus_to_delete";
+        $result_banner = mysqli_query($koneksi, $query_get_banner);
+        $banner_file = '';
+        $nama_kursus_dihapus = '';
+        if ($row_banner = mysqli_fetch_assoc($result_banner)) {
+            $banner_file = $row_banner['gambar_banner'];
+            $nama_kursus_dihapus = $row_banner['judul'];
+        } else {
+            // klo kursus tidak ditemukan, batalkan transaksi
+            throw new Exception("Kursus tidak ditemukan.");
+        }
+
+        // hapus dari detail_jawaban (terkait dengan riwayat_kuis)
+        mysqli_query($koneksi, "DELETE FROM detail_jawaban WHERE id_riwayat IN (SELECT id_riwayat FROM riwayat_kuis WHERE id_kursus = $id_kursus_to_delete)");
+
+        // hapus dari riwayat_kuis
+        mysqli_query($koneksi, "DELETE FROM riwayat_kuis WHERE id_kursus = $id_kursus_to_delete");
+
+        // hapus dari pilihan_jawaban (terkait dengan pertanyaan)
+        mysqli_query($koneksi, "DELETE FROM pilihan_jawaban WHERE id_pertanyaan IN (SELECT id_pertanyaan FROM pertanyaan WHERE id_kursus = $id_kursus_to_delete)");
+
+        // hapus dari pertanyaan
+        mysqli_query($koneksi, "DELETE FROM pertanyaan WHERE id_kursus = $id_kursus_to_delete");
+
+        // hapus dari progress_materi (terkait dengan materi)
+        mysqli_query($koneksi, "DELETE FROM progress_materi WHERE id_materi IN (SELECT id_materi FROM materi WHERE id_kursus = $id_kursus_to_delete)");
+
+        // hapus dari materi
+        mysqli_query($koneksi, "DELETE FROM materi WHERE id_kursus = $id_kursus_to_delete");
+
+        //hapus dari kursus
+        $sql_delete_kursus = "DELETE FROM kursus WHERE id_kursus = $id_kursus_to_delete";
+        if (!mysqli_query($koneksi, $sql_delete_kursus)) {
+            throw new Exception(mysqli_error($koneksi));
+        }
+
+        // hapus file banner
+        $path_to_banner = "../public/uploads/banners/" . $banner_file;
+        if (file_exists($path_to_banner) && !is_dir($path_to_banner)) {
+            unlink($path_to_banner);
+        }
+
+        //commit semua perubahan jika tidak ada error
+        mysqli_commit($koneksi);
+
+        // set pesan sukses
+        $_SESSION['pesan_sukses'] = "Modul '{$nama_kursus_dihapus}' dan materinya berhasil dihapus.";
+    } catch (Exception $e) {
+        // rollback semua perubahan
+        mysqli_rollback($koneksi);
+        // set pesan error
+        $_SESSION['pesan_error'] = "Gagal menghapus modul: " . $e->getMessage();
+    }
+
+    header("Location: dashboard.php?page=modul");
+    exit;
+}
+
 $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 
 $pageTitles = [
@@ -8,11 +75,12 @@ $pageTitles = [
     'anggota' => 'Manajemen Anggota',
     'modul' => 'Manajemen Modul',
     'kuis' => 'Ringkasan Kuis',
-    'tambah_modul' => 'Tambah Modul' 
+    'tambah_modul' => 'Tambah Modul'
 ];
 
 $pageTitle = isset($pageTitles[$currentPage]) ? $pageTitles[$currentPage] : 'Halaman Tidak Ditemukan';
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -59,23 +127,23 @@ $pageTitle = isset($pageTitles[$currentPage]) ? $pageTitles[$currentPage] : 'Hal
             </div>
         </div>
         <!-- set up kondisi untuk memuat file konten berdasarkan halaman yang dipilih -->
-        <?php
-        switch ($currentPage) {
-            case 'anggota':
-                include 'anggota.php';
-                break;
-            case 'modul':
-                include 'modul.php';
-                break;
-            case 'tambah_modul':
-                include 'form/form-modul.php';
-                break;
-            case 'kuis':
-                include 'kuis.php';
-                break;
-            case 'dashboard':
-            default:
-        ?>
+            <?php
+            switch ($currentPage) {
+                case 'anggota':
+                    include 'anggota.php';
+                    break;
+                case 'modul':
+                    include 'modul.php';
+                    break;
+                case 'tambah_modul':
+                    include 'form/form-modul.php';
+                    break;
+                case 'kuis':
+                    include 'kuis.php';
+                    break;
+                case 'dashboard':
+                default:
+            ?>
                 <!-- Card Pelatihan Saya -->
                 <?php
                 // query untuk menghitung total anggota

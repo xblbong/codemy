@@ -25,11 +25,11 @@
     }
   </script>
 </head>
-<body style="background-image: url(../public/foto/bg.svg); background-size: cover; background-position: center; background-repeat: no-repeat;" class="min-h-screen flex items-center justify-center font-sans">
+<body style="background-image: url(../public/uploads/foto/bg.svg); background-size: cover; background-position: center; background-repeat: no-repeat;" class="min-h-screen flex items-center justify-center font-sans">
   <div class="w-full max-w-4xl mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-12 flex flex-col md:flex-row items-center gap-10 mt-10 mb-10">
     <!-- Logo -->
     <div class="w-full md:w-1/2 flex justify-center items-center">
-      <img src="../public/foto/foto.svg" alt="codemy logo" class="w-[100px] md:w-[200px] rounded-xl shadow-lg bg-white p-6">
+      <img src="../public/uploads/foto/foto.svg" alt="codemy logo" class="w-[100px] md:w-[200px] rounded-xl shadow-lg bg-white p-6">
     </div>
     <!-- Formulir Login Admin -->
     <form action="" method="POST" class="w-full md:w-1/2 space-y-5">
