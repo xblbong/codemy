@@ -131,9 +131,8 @@ if (isset($_GET['page']) && isset($_GET['aksi'])) {
         exit();
     }
 
-    // (Anda bisa tambahkan 'else if' untuk proses aksi lain di sini)
 
-} // Akhir dari blok pemrosesan aksi
+} 
 
 
 $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
@@ -147,6 +146,8 @@ $pageTitles = [
     'kelola_modul' => 'Kelola Modul',
     'tambah_materi' => 'Tambah Materi',
     'tambah_kuis' => 'Tambah Kuis',
+    'edit_materi' => 'Edit Materi',
+    'edit_kuis' => 'Edit Kuis',
 ];
 
 $pageTitle = isset($pageTitles[$currentPage]) ? $pageTitles[$currentPage] : 'Halaman Tidak Ditemukan';
@@ -263,8 +264,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
                 case 'tambah_materi':
                     include 'form/tambah-materi.php';
                     break;
+                case 'edit_materi':
+                    include 'form/edit-materi.php';
+                    break;
                 case 'tambah_kuis':
                     include 'form/tambah-kuis.php';
+                    break;
+                case 'edit_kuis':
+                    include 'form/edit-kuis.php';
                     break;
                 case 'kuis':
                     include 'kuis.php';
