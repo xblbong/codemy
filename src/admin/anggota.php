@@ -1,5 +1,14 @@
 <?php
-$query = "SELECT id_pengguna, nama, email, peran, alamat, no_hp from pengguna order by nama asc";
+$search_keyword = isset($_GET['search']) ? mysqli_real_escape_string($koneksi, $_GET['search']) : '';
+$where_clause = "";
+if (!empty($search_keyword)) {
+    $where_clause = "WHERE nama LIKE '%$search_keyword%' OR email LIKE '%$search_keyword%'";
+}
+$query = "SELECT id_pengguna, nama, email, peran, status, no_hp 
+          FROM pengguna 
+          $where_clause 
+          ORDER BY nama ASC";
+
 $result = mysqli_query($koneksi, $query);
 ?>
 
@@ -7,12 +16,14 @@ $result = mysqli_query($koneksi, $query);
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex flex-col items-left gap-2">
             <h2 class="text-2xl font-bold text-codemy-dark mb-2">Data Anggota</h2>
-            <div class="flex items-center gap-4 w-full md:w-auto ">
+           <form method="GET" class="flex items-center gap-4 w-full md:w-auto">
+                <input type="hidden" name="page" value="anggota">
                 <div class="relative flex-1 md:flex-initial">
-                    <input type="text" placeholder="Cari pengguna..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-hover">
+                    <input type="text" name="search" placeholder="Cari pengguna..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-hover" value="<?php echo $search_keyword; ?>">
                     <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 </div>
-            </div>
+                <button type="submit" class="hidden"></button>
+            </form>
         </div>
         <!-- <button class="bg-[#6D00A8] text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-primary-hover transition-colors duration-300">
             <span class="hidden md:inline">Tambah Anggota</span>
@@ -30,6 +41,7 @@ $result = mysqli_query($koneksi, $query);
                     <th class="p-4">Email</th>
                     <th class="p-4">No. HP</th>
                     <th class="p-4">Role</th>
+                    <th class="p-4 text-center">Status</th>
                     <th class="p-4 text-center rounded-r-lg">Aksi</th>
                 </tr>
             </thead>
@@ -68,8 +80,22 @@ $result = mysqli_query($koneksi, $query);
                                 <?php endif; ?>
                             </td>
                             <td class="p-4 text-center">
-                                <a href="edit_anggota.php?id=<?php echo $row['id_pengguna']; ?>" class="text-blue-500 hover:text-blue-700 mr-4" title="Edit">
-                                    <i class="fa-solid fa-pencil"></i>
+                                <?php
+                                $status = $row['status'];
+                                $status_class = '';
+                                if ($status == 'aktif') {
+                                    $status_class = 'bg-green-100 text-green-700';
+                                } elseif ($status == 'nonaktif') {
+                                    $status_class = 'bg-yellow-100 text-yellow-700';
+                                } elseif ($status == 'diblokir') {
+                                    $status_class = 'bg-red-100 text-red-700';
+                                }
+                                ?>
+                                <span class="px-2 py-1 rounded-full <?php echo $status_class; ?>"><?php echo ucfirst($status); ?></span>
+                            </td>
+                            <td class="p-4 text-center">
+                                <a href="dashboard.php?page=detail_anggota&id=<?php echo $row['id_pengguna']; ?>" class="text-blue-500 hover:text-blue-700 mr-4" title="Lihat Detail & Edit">
+                                    <i class="fa-solid fa-eye"></i>
                                 </a>
                                 <a href="hapus_anggota.php?id=<?php echo $row['id_pengguna']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini? Semua data terkait akan ikut terhapus.');" class="text-danger hover:text-red-700" title="Hapus">
                                     <i class="fa-solid fa-trash"></i>

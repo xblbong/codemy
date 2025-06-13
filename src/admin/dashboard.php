@@ -136,6 +136,7 @@ $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 $pageTitles = [
     'dashboard' => 'Dashboard',
     'anggota' => 'Manajemen Anggota',
+    'detail_anggota' => 'Detail Anggota',
     'modul' => 'Manajemen Modul',
     'kuis' => 'Ringkasan Kuis',
     'tambah_modul' => 'Tambah Modul',
@@ -480,6 +481,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['page'])) {
         switch ($currentPage) {
             case 'anggota':
                 include 'anggota.php';
+                break;
+            case 'detail_anggota':
+                include 'form/detail_anggota.php';
                 break;
             case 'modul':
                 include 'modul.php';
