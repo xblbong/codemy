@@ -75,7 +75,8 @@ $pageTitles = [
     'anggota' => 'Manajemen Anggota',
     'modul' => 'Manajemen Modul',
     'kuis' => 'Ringkasan Kuis',
-    'tambah_modul' => 'Tambah Modul'
+    'tambah_modul' => 'Tambah Modul',
+    'kelola_modul' => 'Kelola Modul',
 ];
 
 $pageTitle = isset($pageTitles[$currentPage]) ? $pageTitles[$currentPage] : 'Halaman Tidak Ditemukan';
@@ -137,6 +138,9 @@ $pageTitle = isset($pageTitles[$currentPage]) ? $pageTitles[$currentPage] : 'Hal
                     break;
                 case 'tambah_modul':
                     include 'form/form-modul.php';
+                    break;
+                case 'kelola_modul':
+                    include 'form/kelola-modul.php';
                     break;
                 case 'kuis':
                     include 'kuis.php';
