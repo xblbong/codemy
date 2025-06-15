@@ -28,8 +28,8 @@
     <header class="flex justify-between items-center bg-white px-44 py-3 shadow-md border-b border-gray-100">
         <!-- Logo -->
         <a href="index.php" class="flex gap-3 items-center">
-            <img src="foto/logo-header.svg" alt="logo" class="w-9">
-            <img src="foto/codemy.svg" alt="codemy" class="w-28">
+            <img src="uploads/foto/logo-header.svg" alt="logo" class="w-9">
+            <img src="uploads/foto/codemy.svg" alt="codemy" class="w-28">
         </a>
         <!-- Navigation -->
         <nav class="flex items-center gap-8">
@@ -38,7 +38,7 @@
             <!-- User Dropdown -->
             <div class="relative group">
                 <button class="flex items-center gap-2 font-semibold text-[#1a365d] hover:text-[#620097] focus:outline-none">
-                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#31004C] text-white"><img src="foto/user1.svg" alt="user"></span>
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#31004C] text-white"><img src="uploads/foto/user1.svg" alt="user"></span>
                     <span>Sabilah</span>
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                 </button>
