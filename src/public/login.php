@@ -1,15 +1,18 @@
 <?php
 session_start();
-if (isset($_SESSION['id_pengguna'])) {
-    header("Location: public/index.php"); // Arahkan user yang sudah login ke halaman utama mereka
-    exit();
-}
-
 require_once '../config/koneksi.php';
 
+define('BASE_URL', 'http://localhost/project-kampus/codemy/src/');
+if (isset($_SESSION['id_pengguna'])) {
+    if ($_SESSION['peran'] == 'admin') {
+        header("Location: " . BASE_URL . "admin/dashboard.php");
+    } else {
+        header("Location: " . BASE_URL . "public/index.php");
+    }
+    exit();
+}
 $errors = [];
 
-// Cek jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email_or_username = trim($_POST['email_or_username']);
     $password = $_POST['password'];
@@ -23,27 +26,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
         
-        if (mysqli_num_rows($result) == 1) {
-            $user = mysqli_fetch_assoc($result);
-
-            // Cek password DAN peran
+        if ($user = mysqli_fetch_assoc($result)) {
             if (password_verify($password, $user['password'])) {
-                
-                // Pastikan yang login adalah 'user'
                 if ($user['peran'] !== 'user') {
                     $errors[] = "Akses ditolak. Silakan login melalui halaman login admin.";
                 } elseif ($user['status'] !== 'aktif') {
                     $errors[] = "Akun Anda tidak aktif atau diblokir.";
                 } else {
-                    // Jika semua benar, buat session dan redirect
                     $_SESSION['id_pengguna'] = $user['id_pengguna'];
                     $_SESSION['nama_pengguna'] = $user['nama'];
                     $_SESSION['peran'] = $user['peran'];
                     
-                    header("Location: public/index.php"); // Arahkan ke halaman utama user
+                    // --- 3. GUNAKAN BASE_URL UNTUK REDIRECT ---
+                    header("Location: " . BASE_URL . "public/index.php");
                     exit();
                 }
-
             } else {
                 $errors[] = "Email/Username atau Password salah.";
             }
@@ -93,30 +90,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <h2 class="text-3xl font-bold text-white mb-6">Login</h2>
       
       <!-- Menampilkan pesan error jika ada -->
-      <?php if (!empty($errors)): ?>
+       <?php if (!empty($errors)): ?>
         <div class="bg-red-500/20 border border-red-500/30 text-white p-3 rounded-lg text-sm">
             <?php foreach ($errors as $error): ?>
                 <p><?php echo $error; ?></p>
             <?php endforeach; ?>
         </div>
       <?php endif; ?>
-      
-      <!-- Menampilkan pesan sukses dari halaman registrasi -->
       <?php if (isset($_SESSION['pesan_sukses'])): ?>
         <div class="bg-green-500/20 border border-green-500/30 text-white p-3 rounded-lg text-sm">
             <p><?php echo $_SESSION['pesan_sukses']; ?></p>
         </div>
-        <?php unset($_SESSION['pesan_sukses']); // Hapus pesan setelah ditampilkan ?>
+        <?php unset($_SESSION['pesan_sukses']); ?>
       <?php endif; ?>
-
-      <!-- Input Email atau Username -->
       <div>
         <label for="email_or_username" class="block text-sm font-semibold text-white mb-1">Email atau Username</label>
         <input type="text" id="email_or_username" name="email_or_username" placeholder="Masukkan email atau username" required
                class="w-full px-4 py-2 rounded-lg border border-white/30 bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-codemy-yellow transition">
       </div>
-
-      <!-- Input Password dengan Tombol Show/Hide -->
       <div class="relative">
         <label for="password" class="block text-sm font-semibold text-white mb-1">Password</label>
         <input type="password" id="password" name="password" placeholder="Password" required
@@ -125,7 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <i class="fa-solid fa-eye"></i>
         </button>
       </div>
-      
       <button type="submit" class="w-full bg-codemy-active hover:bg-codemy-yellow text-white hover:text-codemy-dark font-semibold py-3 rounded-lg mt-4 transition text-lg shadow-md">Login</button>
       <p class="text-center text-sm font-light text-white">Belum punya akun? <a href="register.php" class="text-codemy-yellow hover:text-white transition font-semibold">Daftar sekarang</a></p>
     </form>

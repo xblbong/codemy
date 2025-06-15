@@ -2,7 +2,6 @@
 session_start();
 require_once '../config/koneksi.php';
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    // Redirect ke halaman utama atau tampilkan pesan error
     header("Location: index.php");
     exit();
 }
@@ -35,7 +34,6 @@ if (!$kursus) {
 $query_total_materi = "SELECT COUNT(*) AS total FROM materi WHERE id_kursus = $id_kursus";
 $total_materi = mysqli_fetch_assoc(mysqli_query($koneksi, $query_total_materi))['total'];
 
-// Menghitung apakah ada kuis (minimal 1 pertanyaan)
 $query_ada_kuis = "SELECT COUNT(*) AS total FROM pertanyaan WHERE id_kursus = $id_kursus";
 $ada_kuis = mysqli_fetch_assoc(mysqli_query($koneksi, $query_ada_kuis))['total'] > 0;
 
@@ -81,7 +79,7 @@ $ada_kuis = mysqli_fetch_assoc(mysqli_query($koneksi, $query_ada_kuis))['total']
                     class="w-full h-auto max-h-[400px] object-cover rounded-xl shadow-lg">
             </div>
             <div class="capitalize flex items-center gap-4 text-sm text-slate-300 mb-5">
-                <span>Dibuat oleh: <b><?php echo htmlspecialchars($kursus['pembuat']); ?></b></span>
+                <span>Dibuat oleh <b><?php echo htmlspecialchars($kursus['pembuat']); ?></b></span>
                 <span class="text-slate-500">|</span>
                 <span class="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full">
                     <?php echo htmlspecialchars($kursus['nama_kategori'] ?? 'Umum'); ?>
@@ -107,7 +105,7 @@ $ada_kuis = mysqli_fetch_assoc(mysqli_query($koneksi, $query_ada_kuis))['total']
                 <?php echo nl2br(htmlspecialchars($kursus['deskripsi'])); ?>
             </p>
             <div class="flex flex-col md:flex-row justify-end md:justify-end">
-                <a href="modul-pelatihan.php" class="px-8 py-2 rounded-lg bg-[#A259FF] hover:bg-[#FFB800] text-white hover:text-[#31004C] font-semibold text-base transition shadow-md">Mulai Belajar</a>
+                <a href="modul-pelatihan.php?id=<?php echo $id_kursus; ?>" class="px-8 py-2 rounded-lg bg-[#A259FF] hover:bg-[#FFB800] text-white hover:text-[#31004C] font-semibold text-base transition shadow-md">Mulai Belajar</a>
             </div>
         </div>
     </div>
