@@ -35,7 +35,9 @@
         </button>
         <!-- Dropdown menu -->
         <div class="absolute right-0 mt-2 w-48 bg-[#31004C] text-white rounded-lg shadow-lg py-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition z-50">
-            <a href="#" class="block px-5 py-2 hover:bg-[#58287D] transition">Log Out</a>
+            <a href="dashboard.php?page=logout" onclick="return confirm('Anda yakin ingin keluar dari sesi admin?');" class="block px-5 py-2 hover:bg-[#58287D] transition">
+                <i class="fa-solid fa-right-from-bracket mr-2"></i> Log Out
+            </a>
         </div>
     </div>
 </body>

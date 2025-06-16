@@ -26,10 +26,10 @@ $result_riwayat = mysqli_stmt_get_result($stmt_riwayat);
 $riwayat = mysqli_fetch_assoc($result_riwayat);
 
 // Jika riwayat tidak ditemukan (ID salah atau bukan milik user), kembalikan
-// if (!$riwayat) {
-//     header("Location: index.php");
-//     exit();
-// }
+if (!$riwayat) {
+    header("Location: index.php");
+    exit();
+}
 
 // 4. Ambil data 'Total Soal' dengan menghitung dari detail_jawaban
 $query_total_soal = "SELECT COUNT(*) AS total FROM detail_jawaban WHERE id_riwayat = ?";
