@@ -97,9 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       // Jika berhasil, siapkan pesan sukses di session
       $_SESSION['pesan_sukses'] = "Pendaftaran berhasil! Silakan login dengan akun Anda.";
 
-      // Redirect ke halaman login  
+      // Redirect ke halaman yang sesuai
       if ($peran === 'admin') {
         header("Location: ../admin/index.php");
+      } else {
         header("Location: login.php");
       }
       exit();
