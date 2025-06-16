@@ -41,7 +41,7 @@ $query_kursus = "
 $result_kursus = mysqli_query($koneksi, $query_kursus);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 
 <head>
     <meta charset="UTF-8">
@@ -66,8 +66,9 @@ $result_kursus = mysqli_query($koneksi, $query_kursus);
     </script>
 </head>
 
-<body>
+<body class="flex flex-col min-h-full">
     <?php include('./includes/header.php') ?>
+    <main class="flex-grow">
     <!-- Hero Section -->
     <div class="text-white pt-12 py-8">
         <div class="container mx-auto flex justify-end mb-8">
@@ -175,6 +176,7 @@ $result_kursus = mysqli_query($koneksi, $query_kursus);
             ?>
         </div>
     </div>
+    </main>
 
     <!-- Footer -->
     <?php include('./includes/footer.php') ?>

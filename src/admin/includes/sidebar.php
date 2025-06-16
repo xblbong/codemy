@@ -4,7 +4,7 @@ $mainMenu = 'unknown'; // default jika tidak ada yang cocok
 $menuMap = [
     'dashboard' => ['dashboard'],
     'anggota'   => ['anggota', 'edit_anggota'],
-    'modul'     => ['modul', 'tambah_modul','edit_modul', 'kelola_modul', 'tambah_materi', 'tambah_kuis', 'edit_materi', 'edit_kuis'],
+    'modul'     => ['modul', 'tambah_modul','edit_modul', 'kelola_modul', 'tambah_materi', 'tambah_kuis', 'edit_materi', 'edit_kuis', 'tambah_pertanyaan', 'edit_pertanyaan'],
     'kuis'      => ['kuis', 'kelola_kuis']
 ];
 $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
