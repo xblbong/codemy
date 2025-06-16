@@ -148,7 +148,7 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
                             </button>
                         <?php else: ?>
                             <!-- Tombol Finish hanya muncul di soal terakhir -->
-                            <button type="submit" formaction="actions/proses_skor.php" onclick="return confirm('Apakah Anda yakin ingin menyelesaikan kuis?');" class="flex items-center gap-2 bg-green-500 text-white px-4 py-1.5 rounded font-semibold text-sm hover:bg-green-600 transition">
+                            <button type="submit" formaction="skor.php" onclick="return confirm('Apakah Anda yakin ingin menyelesaikan kuis?');" class="flex items-center gap-2 bg-green-500 text-white px-4 py-1.5 rounded font-semibold text-sm hover:bg-green-600 transition">
                                 Finish <i class="fa-solid fa-check-circle"></i>
                             </button>
                         <?php endif; ?>
