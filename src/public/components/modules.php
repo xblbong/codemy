@@ -99,7 +99,7 @@ $ada_kuis = mysqli_fetch_assoc(mysqli_query($koneksi, $query_ada_kuis))['total']
             <div class="mb-3">
                 <h3 class="text-[#FFF] font-semibold mb-2 bg-[#6D00A8] rounded-sm py-3 px-4">Final Quiz</h3>
                 <div class="flex flex-col gap-2 py-3 px-4">
-                    <a href="quiz.php?id_kursus=<?php echo $id_kursus; ?>" class="text-left bg-[#fff] hover:bg-[#58287D] py-2 px-4 rounded cursor-pointer transition text-[#1A1732] hover:text-[#fff] text-sm">Quiz Akhir</a>
+                    <a href="quiz.php?id_kursus=<?php echo $id_kursus; ?>&aksi=mulai" onclick="return confirm('Memulai kuis akan me-reset progress kuis sebelumnya (jika ada). Lanjutkan?');" class="text-left bg-[#fff] hover:bg-[#58287D] py-2 px-4 rounded cursor-pointer transition text-[#1A1732] hover:text-[#fff] text-sm">Quiz Akhir</a>
                 </div>
             </div>
         <?php endif; ?>

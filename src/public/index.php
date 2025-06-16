@@ -133,11 +133,7 @@ $result_kursus = mysqli_query($koneksi, $query_kursus);
 
                             <!-- Deskripsi Dinamis (Dipotong) -->
                             <p class="text-[#E0D7F3] text-sm mb-4">
-                                <?php
-                                $deskripsi = $kursus['deskripsi'];
-                                // Potong deskripsi jika lebih dari 80 karakter, lalu tambahkan '...'
-                                echo htmlspecialchars(strlen($deskripsi) > 80 ? substr($deskripsi, 0, 80) . '...' : $deskripsi);
-                                ?>
+                               
                             </p>
 
                             <!-- Bagian Bawah Kartu -->
