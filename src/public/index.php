@@ -43,7 +43,7 @@ $result_kursus = mysqli_query($koneksi, $query_kursus);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 
 <head>
     <meta charset="UTF-8">

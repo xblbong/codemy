@@ -49,9 +49,9 @@ $ada_kuis = mysqli_fetch_assoc(mysqli_query($koneksi, $query_ada_kuis))['total']
             <h4 class="text-white font-semibold mb-2">Progress Belajar</h4>
             <!-- Progress bar hanya ditampilkan jika login, jika tidak, tampilkan ajakan login -->
             <?php if ($id_pengguna > 0): ?>
-                <progress class="w-full h-2 [&::-webkit-progress-bar]:rounded [&::-webkit-progress-value]:rounded [&::-webkit-progress-bar]:bg-gray-300 [&::-webkit-progress-value]:bg-[#FFF]" value="<?php echo $user_progress; ?>" max="100"></progress>
+            <progress class="w-full h-2 [&::-webkit-progress-bar]:rounded [&::-webkit-progress-value]:rounded [&::-webkit-progress-bar]:bg-yellow-200 [&::-webkit-progress-value]:bg-yellow-500" value="<?php echo $user_progress; ?>" max="100"></progress>
             <?php else: ?>
-                <a href="login.php" class="bg-yellow-500 text-black text-center text-sm font-semibold p-2 rounded-md hover:bg-yellow-400">Login untuk Simpan Progress</a>
+            <a href="login.php" class="bg-yellow-500 text-black text-center text-sm font-semibold p-2 rounded-md hover:bg-yellow-400">Login untuk Simpan Progress</a>
             <?php endif; ?>
         </div>
 

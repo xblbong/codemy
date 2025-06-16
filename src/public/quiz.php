@@ -9,7 +9,7 @@ if (!isset($_SESSION['id_pengguna'])) {
 }
 $id_pengguna = $_SESSION['id_pengguna'];
 
-// cek id_kursus dari URL
+// Cek id_kursus dari URL
 if (!isset($_GET['id_kursus']) || !is_numeric($_GET['id_kursus'])) {
     header("Location: index.php");
     exit();
@@ -18,8 +18,7 @@ $id_kursus = (int)$_GET['id_kursus'];
 
 // Jika kuis baru dimulai (ditandai dengan parameter ?aksi=mulai atau sesi kuis belum ada)
 if (isset($_GET['aksi']) && $_GET['aksi'] == 'mulai' || !isset($_SESSION['kuis_berlangsung']) || $_SESSION['kuis_berlangsung']['id_kursus'] != $id_kursus) {
-
-    //select semua pertanyaan untuk kuis ini
+    // Select semua pertanyaan untuk kuis ini
     $query_semua_id_soal = "SELECT id_pertanyaan FROM pertanyaan WHERE id_kursus = $id_kursus ORDER BY RAND()";
     $hasil_semua_id_soal = mysqli_query($koneksi, $query_semua_id_soal);
 
@@ -37,11 +36,11 @@ if (isset($_GET['aksi']) && $_GET['aksi'] == 'mulai' || !isset($_SESSION['kuis_b
     }
 
     $_SESSION['kuis_berlangsung'] = [
-        'id_kursus'   => $id_kursus,
-        'daftar_id_soal' => $daftar_id_soal, // Untuk menyimpan daftar id_soal
-        'jawaban_pengguna' => [],           // Untuk menyimpan jawaban
-        'soal_sekarang_idx' => 0,            // Mulai dari soal pertama (index 0)
-        'waktu_mulai' => time()             // Catat waktu mulai
+        'id_kursus'         => $id_kursus,
+        'daftar_id_soal'    => $daftar_id_soal,
+        'jawaban_pengguna'  => [],
+        'soal_sekarang_idx' => 0,
+        'waktu_mulai'       => time() // [PENTING] Waktu mulai dicatat di sini sekali saja
     ];
 }
 
@@ -53,19 +52,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id_soal_sekarang'])) {
     // Simpan jawaban pengguna ke session
     $_SESSION['kuis_berlangsung']['jawaban_pengguna'][$id_soal_sekarang] = $id_pilihan_jawaban;
 
-    // Logika navigasi
+    // Logika navigasi: Pindah ke soal lain
     if (isset($_POST['tombol_selanjutnya'])) {
-        // Pindah ke soal berikutnya jika belum soal terakhir
         if ($_SESSION['kuis_berlangsung']['soal_sekarang_idx'] < count($_SESSION['kuis_berlangsung']['daftar_id_soal']) - 1) {
             $_SESSION['kuis_berlangsung']['soal_sekarang_idx']++;
         }
     } elseif (isset($_POST['tombol_navigasi_soal'])) {
-        // Pindah ke soal yang diklik di navigasi kanan
         $_SESSION['kuis_berlangsung']['soal_sekarang_idx'] = (int)$_POST['tombol_navigasi_soal'];
     }
+    // Tidak ada 'else' untuk tombol finish, karena action-nya akan ditangani oleh 'formaction' di HTML
 }
 
-//untuk soal aktif saat ini
+// Data untuk soal aktif saat ini
 $index_soal_sekarang = $_SESSION['kuis_berlangsung']['soal_sekarang_idx'];
 $id_soal_aktif = $_SESSION['kuis_berlangsung']['daftar_id_soal'][$index_soal_sekarang];
 
@@ -94,6 +92,7 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
     <title>Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
@@ -123,11 +122,10 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
             <div class="bg-[#211B36] border border-[#A259FF] rounded-xl flex flex-col md:flex-row overflow-hidden shadow-lg">
                 <!-- Kiri: Soal & Pilihan -->
                 <div class="flex-1 p-8 flex flex-col justify-between">
-                    <!-- Judul & Deskripsi Quiz -->
                     <div>
                         <div class="text-white text-base md:text-lg font-medium mb-4 flex items-start gap-2">
                             <span><?php echo $index_soal_sekarang + 1; ?>.</span>
-                            <span><?php echo nl2br(htmlspecialchars($soal_aktif['teks_pertanyaan'])); ?>
+                            <span><?php echo nl2br(htmlspecialchars($soal_aktif['teks_pertanyaan'])); ?></span>
                         </div>
                         <div class="flex flex-col gap-3 mt-6">
                             <?php
@@ -135,7 +133,7 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
                             while ($pilihan = mysqli_fetch_assoc($hasil_pilihan_jawaban)):
                             ?>
                                 <label class="flex items-center gap-2 cursor-pointer text-white text-base">
-                                    <input type="radio" name="jawaban" value="<?php echo $pilihan['id_pilihan']; ?>" <?php if ($pilihan['id_pilihan'] == $jawaban_tersimpan) echo 'checked'; ?> class="accent-[#A259FF]" />
+                                    <input type="radio" name="jawaban" value="<?php echo $pilihan['id_pilihan']; ?>" <?php if ($pilihan['id_pilihan'] == $jawaban_tersimpan) echo 'checked'; ?> class="accent-[#A259FF]" required />
                                     <span><?php echo htmlspecialchars($pilihan['teks_pilihan']); ?></span>
                                 </label>
                             <?php endwhile; ?>
@@ -147,8 +145,8 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
                                 Selanjutnya <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         <?php else: ?>
-                            <!-- Tombol Finish hanya muncul di soal terakhir -->
-                            <button type="submit" formaction="skor.php" onclick="return confirm('Apakah Anda yakin ingin menyelesaikan kuis?');" class="flex items-center gap-2 bg-green-500 text-white px-4 py-1.5 rounded font-semibold text-sm hover:bg-green-600 transition">
+                            <!-- [PERBAIKAN] Tombol Finish sekarang mengirim form ke 'proses_skor.php' -->
+                            <button type="submit" name="selesai_kuis" value="1" formaction="proses_skor.php" onclick="return confirm('Apakah Anda yakin ingin menyelesaikan kuis?');" class="flex items-center gap-2 bg-green-500 text-white px-4 py-1.5 rounded font-semibold text-sm hover:bg-green-600 transition">
                                 Finish <i class="fa-solid fa-check-circle"></i>
                             </button>
                         <?php endif; ?>
@@ -158,7 +156,7 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
                 <div class="w-full md:w-64 border-l border-[#A259FF] flex flex-col items-center justify-start p-8 bg-[#211B36]">
                     <div class="text-center mb-4">
                         <p class="text-sm text-slate-400">Sisa Waktu</p>
-                        <div id="timer" class="text-white text-2xl font-bold">05.00</div>
+                        <div id="timer" class="text-white text-2xl font-bold">10:00</div>
                     </div>
                     <div class="grid grid-cols-4 gap-2">
                         <?php foreach ($_SESSION['kuis_berlangsung']['daftar_id_soal'] as $index => $id_soal_nav): ?>
@@ -166,11 +164,12 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
                             $sudah_dijawab = isset($_SESSION['kuis_berlangsung']['jawaban_pengguna'][$id_soal_nav]) && $_SESSION['kuis_berlangsung']['jawaban_pengguna'][$id_soal_nav] != 0;
                             $sedang_aktif = ($index == $index_soal_sekarang);
 
-                            $class_tombol = 'bg-transparent text-white border-white/30';
+                            $class_tombol = 'bg-transparent text-white border-white/30 hover:bg-white/20';
                             if ($sedang_aktif) $class_tombol = 'bg-yellow-500 text-black border-yellow-500';
                             elseif ($sudah_dijawab) $class_tombol = 'bg-blue-500 text-white border-blue-500';
                             ?>
-                            <button type="submit" name="tombol_navigasi_soal" value="<?php echo $index; ?>" class="w-10 h-10 border border-white rounded bg-transparent text-white font-semibold <?php echo $class_tombol; ?>"> <?php echo $index + 1; ?></button><?php endforeach; ?>
+                            <button type="submit" name="tombol_navigasi_soal" value="<?php echo $index; ?>" class="w-10 h-10 border rounded font-semibold transition <?php echo $class_tombol; ?>"> <?php echo $index + 1; ?></button>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>
@@ -178,9 +177,12 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
     </div>
 
     <script>
-        const waktuMulai = <?php echo time(); ?>; // dari PHP
-        const durasiKuis = 10; // 5 menit
+        // [PERBAIKAN] Logika timer dibuat lebih konsisten
+        // Ambil waktu mulai dari session PHP, yang nilainya tetap selama kuis berlangsung
+        const waktuMulai = <?php echo $_SESSION['kuis_berlangsung']['waktu_mulai']; ?>;
+        const durasiKuis = 600; // 10 menit dalam detik
         const elemenTimer = document.getElementById('timer');
+        const formKuis = document.getElementById('formKuis');
 
         function updateTimer() {
             const waktuSekarang = Math.floor(Date.now() / 1000);
@@ -189,9 +191,12 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
 
             if (sisaWaktu <= 0) {
                 elemenTimer.textContent = "00:00";
-                document.getElementById('formKuis').setAttribute('action', 'skor.php');
-                document.getElementById('formKuis').submit();
-                clearInterval(timerInterval);
+                clearInterval(timerInterval); // Hentikan interval
+                alert("Waktu habis! Kuis akan diselesaikan secara otomatis.");
+                
+                // [PERBAIKAN] Auto-submit harus ke 'proses_skor.php'
+                formKuis.setAttribute('action', 'proses_skor.php');
+                formKuis.submit();
                 return;
             }
 
@@ -201,8 +206,8 @@ $apakah_soal_terakhir = ($index_soal_sekarang == $total_soal - 1);
         }
 
         const timerInterval = setInterval(updateTimer, 1000);
+        // Panggil sekali di awal untuk tampilan instan
         updateTimer();
     </script>
 </body>
-
 </html>
