@@ -105,7 +105,26 @@ $ada_kuis = mysqli_fetch_assoc(mysqli_query($koneksi, $query_ada_kuis))['total']
                 <?php echo nl2br(htmlspecialchars($kursus['deskripsi'])); ?>
             </p>
             <div class="flex flex-col md:flex-row justify-end md:justify-end">
-                <a href="modul-pelatihan.php?id=<?php echo $id_kursus; ?>" class="px-8 py-2 rounded-lg bg-[#A259FF] hover:bg-[#FFB800] text-white hover:text-[#31004C] font-semibold text-base transition shadow-md">Mulai Belajar</a>
+                <?php
+                // Cek apakah pengguna sudah login (berdasarkan session yang sudah dimulai di atas)
+                if (isset($_SESSION['id_pengguna'])):
+                ?>
+                    <!-- untuk pengguna yang udh login -->
+                    <a href="modul-pelatihan.php?id=<?php echo $id_kursus; ?>"
+                        class="px-8 py-2 rounded-lg bg-[#A259FF] hover:bg-[#FFB800] text-white hover:text-[#31004C] font-semibold text-base transition shadow-md">
+                        Mulai Belajar
+                    </a>
+                <?php
+                else:
+                ?>
+                    <!-- untuk pengguna yang blm login -->
+                    <a href="login.php?redirect_url=<?php echo urlencode('modul-pelatihan.php?id=' . $id_kursus); ?>"
+                        class="px-8 py-2 rounded-lg bg-[#A259FF] hover:bg-[#FFB800] text-white hover:text-[#31004C] font-semibold text-base transition shadow-md">
+                        Login untuk Mulai Belajar
+                    </a>
+                <?php
+                endif;
+                ?>
             </div>
         </div>
     </div>
