@@ -3,8 +3,8 @@
     <div class="max-w-screen-xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
         <!-- Kolom Logo -->
         <div class="col-span-2 md:col-span-1">
-            <a href="index.php" class="inline-block mb-4">
-                <img src="uploads/foto/codemy-logo-white.svg" alt="logo" class="h-8"> <!-- Asumsi ada logo versi putih -->
+            <a href="index.php" class="inline-block mb-4 bg-white">
+                <img src="uploads/foto/logo-header.svg" alt="logo" class="h-8"> <!-- Asumsi ada logo versi putih -->
             </a>
             <p class="text-sm text-gray-400">© <?php echo date("Y"); ?> Codemy.<br>All rights reserved.</p>
         </div>

@@ -135,7 +135,7 @@ try {
     // Rollback jika ada error
     mysqli_rollback($koneksi);
     // Tampilkan pesan error yang lebih user-friendly
-    error_log("Error dalam proses_skor.php: " . $e->getMessage());
+    error_log("Error dalam skor.php: " . $e->getMessage());
     echo "Terjadi kesalahan saat memproses kuis Anda. Silakan coba lagi. <br>";
     echo "Pesan Error: " . htmlspecialchars($e->getMessage()); // Tampilkan pesan untuk debugging
     echo "<br><a href='index.php'>Kembali ke halaman utama</a>";
